@@ -1,0 +1,17 @@
+# Carpetas generadas por Unity
+/Library/
+/Temp/
+/Obj/
+/Build/
+/Logs/
+/UserSettings/
+
+# Archivos de IDE (VS, Rider, etc.)
+*.csproj
+*.sln
+*.userprefs
+.vscode/
+
+# Conserva los .meta de Assets y Packages
+!/Assets/**/*.meta
+!/Packages/**/*.meta
