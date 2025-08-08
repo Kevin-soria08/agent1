@@ -7,8 +7,8 @@
 /UserSettings/
 
 # Archivos de IDE (VS, Rider, etc.)
-*.csproj
-*.sln
+#*.csproj
+#*.sln
 *.userprefs
 .vscode/
 
