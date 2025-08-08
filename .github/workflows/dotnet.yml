@@ -1,33 +1,46 @@
-# This workflow will build a .NET project
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
-
-name: .NET
+name: Unity CI
 
 on:
   push:
-    branches: [ "main" ]
+    branches:
+      - main
   pull_request:
-    branches: [ "main" ]
+    branches:
+      - main
 
 jobs:
   build:
-
+    name: Build Unity Project 🧱
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: 9.0.x
+      # Checkout del código fuente
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-    - name: Restore dependencies
-      run: dotnet restore agent1.sln
+      # Cache para acelerar builds
+      - name: Cache Library
+        uses: actions/cache@v3
+        with:
+          path: Library
+          key: Library-${{ runner.os }}-${{ hashFiles('**/Assets/**', '**/Packages/**', '**/ProjectSettings/**') }}
+          restore-keys: |
+            Library-${{ runner.os }}
 
-    - name: Build
-      run: dotnet build agent1.sln --no-restore
+      # Compilar con Unity usando GameCI
+      - name: Build with Unity
+        uses: game-ci/unity-builder@v2
+        with:
+          unityVersion: 6000.1.12f1
+          targetPlatform: StandaloneWindows64  # O WebGL, Android, etc.
 
-    - name: Test
-      run: dotnet test agent1.sln --no-build --verbosity normal
+      # (Opcional) Subir los artefactos
+      - name: Upload Build
+        uses: actions/upload-artifact@v4
+        with:
+          name: Build
+          path: build/
+
+
 
 
