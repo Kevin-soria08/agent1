@@ -1,5 +1,3 @@
-using UnityEngine;
-
 namespace MyGame.Domain.Entities
 {
     /// <summary>

@@ -1,5 +1,5 @@
 using System;
- using UnityEngine;
+using System.Numerics;
 using MyGame.Domain.Interfaces;
 
 namespace MyGame.Domain.Entities
@@ -44,7 +44,7 @@ namespace MyGame.Domain.Entities
         /// <inheritdoc />
         public void TakeDamage(float amount)
         {
-            Health = Mathf.Max(0f, Health - amount);
+            Health = MathF.Max(0f, Health - amount);
             if (Health <= 0f)
             {
                 OnDeath?.Invoke();

@@ -46,6 +46,7 @@ namespace MyGame.Presentation.Controllers
         private void HandleMovement()
         {
             Vector2 movement = GameBootstrap.InputService.MovementVector;
+            _playerData.Move(new System.Numerics.Vector2(movement.x, movement.y));
             Vector2 velocity = movement.normalized * _playerData.Speed;
             _rigidbody2D.linearVelocity = velocity;
 
