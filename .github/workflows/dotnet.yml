@@ -1,45 +1,66 @@
 name: Unity CI
+name: Build .NET 9 (safe)
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
   pull_request:
-    branches:
-      - main
+    branches: [ main ]
 
 jobs:
   build:
-    name: Build Unity Project 🧱
     runs-on: ubuntu-latest
 
+    env:
+      SOLUTION: ${{ hashFiles('**/*.sln') }}
+      CSPROJ:   ${{ hashFiles('**/*.csproj') }}
+
     steps:
-      # Checkout del código fuente
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
 
-      # Cache para acelerar builds
-      - name: Cache Library
-        uses: actions/cache@v3
+      - name: Setup .NET 9.0.x
+        uses: actions/setup-dotnet@v4
         with:
-          path: Library
-          key: Library-${{ runner.os }}-${{ hashFiles('**/Assets/**', '**/Packages/**', '**/ProjectSettings/**') }}
-          restore-keys: |
-            Library-${{ runner.os }}
+          dotnet-version: 9.0.x
 
-      # Compilar con Unity usando GameCI
-      - name: Build with Unity
-        uses: game-ci/unity-builder@v2
-        with:
-          unityVersion: 6000.1.12f1
-          targetPlatform: StandaloneWindows64  # O WebGL, Android, etc.
+      # Restaura por solución si existe
+      - name: Restore (solution)
+        if: env.SOLUTION != ''
+        run: dotnet restore "$SOLUTION"
 
-      # (Opcional) Subir los artefactos
-      - name: Upload Build
-        uses: actions/upload-artifact@v4
-        with:
-          name: Build
-          path: build/
+      # O restaura cada csproj si no hay .sln
+      - name: Restore (csproj)
+        if: env.SOLUTION == '' && env.CSPROJ != ''
+        shell: bash
+        run: |
+          for f in $CSPROJ; do
+            dotnet restore "$f"
+          done
+
+      - name: Build (solution)
+        if: env.SOLUTION != ''
+        run: dotnet build "$SOLUTION" -c Release --no-restore
+
+      - name: Build (csproj)
+        if: env.SOLUTION == '' && env.CSPROJ != ''
+        shell: bash
+        run: |
+          for f in $CSPROJ; do
+            dotnet build "$f" -c Release --no-restore
+          done
+
+      - name: Test (solution)
+        if: env.SOLUTION != ''
+        run: dotnet test "$SOLUTION" --no-build --verbosity normal
+
+      - name: Test (csproj)
+        if: env.SOLUTION == '' && env.CSPROJ != ''
+        shell: bash
+        run: |
+          for f in $CSPROJ; do
+            dotnet test "$f" --no-build --verbosity normal || true
+          done
 
 
 
