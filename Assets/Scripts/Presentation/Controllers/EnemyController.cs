@@ -54,6 +54,7 @@ namespace MyGame.Presentation.Controllers
         {
             if (_target == null) return;
             Vector2 direction = (_target.position - transform.position).normalized;
+            _enemyData.Move(new System.Numerics.Vector2(direction.x, direction.y));
             _rigidbody2D.velocity = direction * _enemyData.Speed;
         }
 
